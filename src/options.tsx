@@ -1,41 +1,30 @@
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import SaveIcon from '@mui/icons-material/Save';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
+interface ISetting {
+  baseUrl: string;
+}
+
 const Options = () => {
+  const [hasSaved, setHasSaved] = useState<boolean>(true);
   const [baseUrl, setBaseUrl] = useState<string>('https://github.com');
-  const [color, setColor] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
-  const [like, setLike] = useState<boolean>(false);
 
   useEffect(() => {
-    // Restores select box and checkbox state using the preferences
-    // stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        favoriteColor: 'red',
-        likesColor: true,
-      },
-      (items) => {
-        setColor(items.favoriteColor);
-        setLike(items.likesColor);
-      }
-    );
+    chrome.storage.sync.get(['baseUrl'], (items) => setBaseUrl(items.baseUrl));
   }, []);
+
+  useEffect(() => {
+    setHasSaved(false);
+  }, [baseUrl])
 
   const saveOptions = () => {
     // Saves options to chrome.storage.sync.
-    chrome.storage.sync.set(
-      {
-        favoriteColor: color,
-        likesColor: like,
-      },
-      () => {
+    chrome.storage.sync.set({ baseUrl }, () => {
         // Update status to let user know options were saved.
-        setStatus('Options saved.');
-        const id = setTimeout(() => {
-          setStatus('');
-        }, 1000);
-        return () => clearTimeout(id);
+        setHasSaved(true);
       }
     );
   };
@@ -43,28 +32,23 @@ const Options = () => {
   return (
     <>
       <div>
-        Favorite color: <select
-          value={color}
-          onChange={(event) => setColor(event.target.value)}
-        >
-          <option value='red'>red</option>
-          <option value='green'>green</option>
-          <option value='blue'>blue</option>
-          <option value='yellow'>yellow</option>
-        </select>
+        <TextField
+          label="Size"
+          id="outlined-size-small"
+          size="small"
+          defaultValue={baseUrl}
+          value={baseUrl}
+          onChange={(e) => setBaseUrl(e.target.value)}
+        />
       </div>
-      <div>
-        <label>
-          <input
-            type='checkbox'
-            checked={like}
-            onChange={(event) => setLike(event.target.checked)}
-          />
-          I like colors.
-        </label>
-      </div>
-      <div>{status}</div>
-      <button onClick={saveOptions}>Save</button>
+      <Button
+        variant="contained"
+        onClick={saveOptions}
+        startIcon={<SaveIcon />}
+        disabled={hasSaved}
+      >
+        Save
+      </Button>
     </>
   );
 };
