@@ -1,12 +1,13 @@
 import Chip from '@mui/material/Chip';
 import MergeTypeIcon from '@mui/icons-material/MergeType';
-import Alert from '@mui/material/Alert';
-import Avatar from '@mui/material/Avatar';
+import Alert, { AlertColor } from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { IBlacklist } from '../options';
 
 export const notificationClassName = 'extensions-notification'; 
-export const notificationId = 'extensions-notification'; 
+export const notificationId = 'extensions-notification';
+const githubMergeBtnClassName = 'btn-group-merge';
 
 interface Props {
   baseBranchName: string;
@@ -18,6 +19,8 @@ interface Props {
 
 const Notification: React.FC<Props> = (props: Props) => {
   const { baseBranchName, baseBranchHref, headBranchName, headBranchHref } = props;
+  const [ severity, setSeverity ] = useState<AlertColor>('info');
+
   const chipStyle = {
     fontSize: '1rem',
     boxShadow: '#00000080 3px 3px 3px',
@@ -25,10 +28,36 @@ const Notification: React.FC<Props> = (props: Props) => {
     padding: '0px 10px',
     borderRadius: '5px',
   };
+
+  useEffect(() => {
+    chrome.storage.sync.get(['blacklists'], (items) => {
+      const bls: IBlacklist[] = items?.blacklists || [];
+      bls.forEach((bl) => {
+        console.log(bl);
+        const baseRegExp = new RegExp(bl.baseRegExp);
+        const headRegExp = new RegExp(bl.headRegExp);
+        const isInBLBase = bl.baseRegExp ? baseRegExp.test(baseBranchName) : false;
+        const isInBLHead = bl.headRegExp ? headRegExp.test(headBranchName) : false;
+        let result: AlertColor = 'info';
+        if (bl.baseRegExp && bl.headRegExp) {
+          result = isInBLBase && isInBLHead ? 'warning': 'success';
+        } else {
+          result = isInBLBase || isInBLHead ? 'warning': 'success'
+        }
+        if (result === 'warning' && bl.enablePreventMerge) {
+          result = 'error';
+          const targetEls = document.getElementById(githubMergeBtnClassName);
+          console.log('Merge btns', targetEls);
+        }
+        setSeverity(result);
+      });
+    });
+  }, []);
+
   return (
     <Alert
       variant="filled"
-      severity="info"
+      severity={severity}
       className={notificationClassName}
       style={{
         width: '100%',

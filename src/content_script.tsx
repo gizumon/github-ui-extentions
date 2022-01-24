@@ -115,6 +115,10 @@ const appendNotificationEl = () => {
   const headBranchName = headRefEl[0].querySelector('span')?.textContent || '';
   const headBranchHref = headRefEl[0].querySelector('a')?.href || '';
 
+  if (document.getElementById(notificationId)) {
+    return; // already added
+  }
+
   const extensionEl = document.createElement('div');
   extensionEl.id = notificationId;
   targetEl[0].appendChild(extensionEl);
