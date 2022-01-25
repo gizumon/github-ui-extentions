@@ -24,6 +24,9 @@
       "js": [
         "js/vendor.js",
         "js/content_script.js"
+      ],
+      "css": [
+        "style.css"
       ]
     }
   ],

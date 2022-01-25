@@ -10,6 +10,7 @@ console.log('run initialize');
 const baseRefClassName = 'base-ref';
 const headRefClassName = 'head-ref';
 const mergeDetailClassName = 'mergeability-details';
+const mergeBlockCssSelector = '.merge-message > button, details'
 
 const regexpPullReq = /^issue_([0-9]+)$/;
 const regexpPullsPage = /\/([^\/]+)\/([^\/]+)\/pulls.+/; // 0:org, 1:repo
@@ -36,6 +37,8 @@ chrome.runtime.onMessage.addListener(function (msg: IMessage, sender, sendRespon
     // case isPullsListPage(msg.path):
     //   return;
     case isPullDetailPage(msg.path):
+      // for UI re render case without page move
+      // const timer = setInterval(onPullDetailPageLoad, 1000);
       return onPullDetailPageLoad();
     default:
       return;
@@ -83,12 +86,15 @@ const onPullDetailPageLoad = async(): Promise<void> => {
     return;
   }
   while (!hasReady() && count < maxRetry) {
-    console.log('loop', count);
-    count++;
+    count = count + 1;
+    console.log('has ready', hasReady(), 'loop', count);
     await sleepWithDelay(delay);
   }
-  console.log('find elements');
-  appendNotificationEl();
+
+  if (count < maxRetry) {
+    console.log('find elements');
+    appendNotificationEl();
+  }
 }
 
 const hasReady = () => {
@@ -110,10 +116,10 @@ const appendNotificationEl = () => {
   const targetEl = document.getElementsByClassName(mergeDetailClassName);
   const baseRefEl = document.getElementsByClassName(baseRefClassName);
   const headRefEl = document.getElementsByClassName(headRefClassName);
-  const baseBranchName = baseRefEl[0].querySelector('span')?.textContent || '';
-  const baseBranchHref = baseRefEl[0].querySelector('a')?.href || '';
-  const headBranchName = headRefEl[0].querySelector('span')?.textContent || '';
-  const headBranchHref = headRefEl[0].querySelector('a')?.href || '';
+  const baseBranchName = baseRefEl[0]?.querySelector('span')?.textContent || '';
+  const baseBranchHref = baseRefEl[0]?.querySelector('a')?.href || '';
+  const headBranchName = headRefEl[0]?.querySelector('span')?.textContent || '';
+  const headBranchHref = headRefEl[0]?.querySelector('a')?.href || '';
 
   if (document.getElementById(notificationId)) {
     return; // already added

@@ -1,0 +1,5 @@
+.extensions-disabled {
+  pointer-events: none!important;
+  color: #eee!important;
+  background-color: #999!important;
+}

@@ -1,8 +1,36 @@
-# Chrome Extension TypeScript Starter
+# GitHub UI Extensions
 
 ![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
 
 Chrome Extension, TypeScript and Visual Studio Code
+
+## For users
+
+### features
+
+#### Display Base / Head branch in PR
+
+You can check base / head branch when you want to merge PR.
+
+[success](./docs/assets/success.png)
+
+#### Regular Expression Branch Rule validation
+
+You can set validations along with your branch rule from extension options.
+
+[options](./docs/assets/options.png)
+
+Based on the setting, this extension will validate the branch rule and raise an alert in the bottom of a merge button.
+
+[warning](./docs/assets/warning.png)
+
+If you set a validation as a strict mode, then merge button will be disabled and prevent from the unintended merge.
+
+[error](./docs/assets/error.png)
+
+## For developers
+
+<details><summary>click here</summary>
 
 ## Prerequisites
 
@@ -34,37 +62,29 @@ Chrome Extension, TypeScript and Visual Studio Code
 
 ## Setup
 
+### Install dependencies
+
 ```
 npm install
 ```
 
-## Import as Visual Studio Code project
-
-...
-
-## Build
+### Build
 
 ```
 npm run build
 ```
 
-## Build in watch mode
-
-### terminal
-
-```
-npm run watch
-```
-
-### Visual Studio Code
-
-Run watch mode.
-
-type `Ctrl + Shift + B`
+* Build in watch mode
+  
+    ```
+    npm run watch
+    ```
 
 ## Load extension to chrome
 
-Load `dist` directory
+Load `./dist` directory
 
 ## Test
 `npx jest` or `npm run test`
+
+</details>

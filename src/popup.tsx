@@ -13,21 +13,36 @@ const Popup = () => {
         padding: '10px',
       }}
     >
+      <div>
+        RegExp validations setting
+      </div>
+      <Chip
+        size="small"
+        color="success"
+        avatar={<Avatar alt="gizumon" src="icon.png" />}
+        label="Extension Option Link"
+        variant="filled"
+        onClick={() => {
+          chrome?.runtime?.openOptionsPage()
+        }}
+        style={{
+          cursor: "pointer"
+        }}
+      />
       <div
         style={{
-          marginBottom: '5px',
+          margin: '10px 0px',
         }}
       >
         Issue report or any comments
       </div>
       <Chip
         size="small"
-        color="success"
-        avatar={<Avatar alt="gizumon" src="icon.png" />}
+        color="info"
+        avatar={<Avatar alt="gizumon" src="gizumon.jpg" />}
         component="a"
         label="Developer's Link"
         variant="filled"
-        href="https://github.com/gizumon/github-ui-extentions"
         target="_blank"
         style={{
           cursor: "pointer"

@@ -1,13 +1,15 @@
 import Chip from '@mui/material/Chip';
 import MergeTypeIcon from '@mui/icons-material/MergeType';
 import Alert, { AlertColor } from '@mui/material/Alert';
+import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import React, { useEffect, useState } from 'react';
 import { IBlacklist } from '../options';
 
 export const notificationClassName = 'extensions-notification'; 
 export const notificationId = 'extensions-notification';
-const githubMergeBtnClassName = 'btn-group-merge';
+const mergeBlockCssSelector = '#partial-pull-merging .merge-message .select-menu button'
+const disabledClassName = 'extensions-disabled'
 
 interface Props {
   baseBranchName: string;
@@ -20,6 +22,7 @@ interface Props {
 const Notification: React.FC<Props> = (props: Props) => {
   const { baseBranchName, baseBranchHref, headBranchName, headBranchHref } = props;
   const [ severity, setSeverity ] = useState<AlertColor>('info');
+  const [ alertMsg, setAlertMsg ] = useState<string>('');
 
   const chipStyle = {
     fontSize: '1rem',
@@ -30,27 +33,35 @@ const Notification: React.FC<Props> = (props: Props) => {
   };
 
   useEffect(() => {
-    chrome.storage.sync.get(['blacklists'], (items) => {
+    chrome?.storage?.sync?.get(['blacklists'], (items) => {
       const bls: IBlacklist[] = items?.blacklists || [];
-      bls.forEach((bl) => {
+      let result: AlertColor = 'info';
+      bls.some((bl) => {
         console.log(bl);
         const baseRegExp = new RegExp(bl.baseRegExp);
         const headRegExp = new RegExp(bl.headRegExp);
         const isInBLBase = bl.baseRegExp ? baseRegExp.test(baseBranchName) : false;
         const isInBLHead = bl.headRegExp ? headRegExp.test(headBranchName) : false;
-        let result: AlertColor = 'info';
+
+        // TODO: Should refactor
         if (bl.baseRegExp && bl.headRegExp) {
           result = isInBLBase && isInBLHead ? 'warning': 'success';
         } else {
           result = isInBLBase || isInBLHead ? 'warning': 'success'
         }
-        if (result === 'warning' && bl.enablePreventMerge) {
-          result = 'error';
-          const targetEls = document.getElementById(githubMergeBtnClassName);
-          console.log('Merge btns', targetEls);
+        // once warning is happened, then exit loop
+        if (result === 'warning') {
+          setAlertMsg(bl.alertMessage);
+          if (bl.enablePreventMerge) {
+            result = 'error';
+            const targetEls = document.querySelectorAll(mergeBlockCssSelector);
+            targetEls.forEach((el) => el.classList.add(disabledClassName));
+            return true; // exit loop
+          }
+          return true; // exit loop
         }
-        setSeverity(result);
       });
+      setSeverity(result);
     });
   }, []);
 
@@ -69,6 +80,21 @@ const Notification: React.FC<Props> = (props: Props) => {
         direction={'row'}
         spacing={0.5}
       >
+        {
+          !!alertMsg &&
+            <Typography
+              style={{
+                fontSize: '0.8rem',
+                lineHeight: '26px',
+                fontWeight: 600,
+                marginRight: '5px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                color: '#ffffff',
+              }}
+            >{alertMsg}</Typography>
+        }
         <Chip
           size="small"
           color='error'

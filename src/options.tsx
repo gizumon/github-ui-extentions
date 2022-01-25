@@ -94,7 +94,10 @@ const Options = () => {
             }
           >
             <IconButton>
-              <Info onClick={() => setShowInfo((pre) => !pre)} />
+              <Info
+                color='info'
+                onClick={() => setShowInfo((pre) => !pre)}
+              />
             </IconButton>
           </Tooltip>
         </FormLabel>
@@ -221,9 +224,11 @@ const Options = () => {
                 labelPlacement="end"
                 label="Strict error option (prevent the merge)"
                 value={bl.enablePreventMerge}
+                defaultChecked={bl.enablePreventMerge}
                 control={
                   <Switch
                     color="primary"
+                    checked={bl.enablePreventMerge}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBlacklists(bls => {
                       const blacklists = [...bls];
                       blacklists[i].enablePreventMerge = e.target.checked;
