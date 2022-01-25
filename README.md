@@ -2,31 +2,29 @@
 
 ![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
 
-Chrome Extension, TypeScript and Visual Studio Code
+Chrome Extension for GitHub (Support GitHub Enterprize)
 
-## For users
+## features
 
-### features
-
-#### Display Base / Head branch in PR
+### Display Base / Head branch in PR
 
 You can check base / head branch when you want to merge PR.
 
-[success](./docs/assets/success.png)
+![success](./docs/assets/success.png)
 
-#### Regular Expression Branch Rule validation
+### Regular Expression Branch Rule validation
 
 You can set validations along with your branch rule from extension options.
 
-[options](./docs/assets/options.png)
+![options](./docs/assets/options.png)
 
 Based on the setting, this extension will validate the branch rule and raise an alert in the bottom of a merge button.
 
-[warning](./docs/assets/warning.png)
+![warning](./docs/assets/warning.png)
 
 If you set a validation as a strict mode, then merge button will be disabled and prevent from the unintended merge.
 
-[error](./docs/assets/error.png)
+![error](./docs/assets/error.png)
 
 ## For developers
 
