@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import SaveIcon from '@mui/icons-material/Save';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Box, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Switch, Tooltip, Typography } from '@mui/material';
+import { Box, createTheme, FormControlLabel, FormGroup, FormLabel, IconButton, Paper, Stack, Switch, ThemeProvider, Tooltip, Typography } from '@mui/material';
 import { Add, Delete, Info } from '@mui/icons-material';
 
 const enabledGitHubURLSettingFeature = false;
@@ -11,21 +11,46 @@ const enabledGitHubURLSettingFeature = false;
 export interface IBlacklist {
   baseRegExp: string;
   headRegExp: string;
+  alertMessage: string;
   enablePreventMerge: boolean;
 }
 
 const defaultBlacklist = {
   baseRegExp: '',
   headRegExp: '',
+  alertMessage: '',
   enablePreventMerge: false,
 }
 
+const examples = [{
+  title: 'Alert merging into "master" branch',
+  baseRegExp: '^master$',
+  headRegExp: '*',
+  alertMessage: 'NOTE: This branch will merge into "master" branch!!!',
+  enablePreventMerge: false,
+},{
+  title: 'Prevent merging from "master" branch',
+  baseRegExp: '*',
+  headRegExp: '^master$',
+  alertMessage: 'ERROR: Should not merge from "master" branch!!!',
+  enablePreventMerge: true,
+},{
+  title: 'Alert for merging into "develop" branch from "feature/*" branch',
+  baseRegExp: '^develop$',
+  headRegExp: '^feature/.+',
+  alertMessage: 'NOTE: Please make sure the source branch is correct!!!',
+  enablePreventMerge: false,
+}];
+
+const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
 const Options = () => {
   const [hasSaved, setHasSaved] = useState<boolean>(true);
+  const [showInfo, setShowInfo] = useState<boolean>(false);
   const [blacklists, setBlacklists] = useState<IBlacklist[]>([]);
 
   useEffect(() => {
-    chrome.storage.sync.get(['blacklists'], (items) => {
+    chrome?.storage?.sync?.get(['blacklists'], (items) => {
       console.log('get chrome storage', items)
       setBlacklists(items?.blacklists || [])
     });
@@ -44,7 +69,7 @@ const Options = () => {
     <Box
       component="form"
       sx={{
-        minWidth: '600px',
+        minWidth: '700px',
         '& .MuiTextField-root': { m: 1, width: '80%' },
       }}
       noValidate
@@ -69,10 +94,68 @@ const Options = () => {
             }
           >
             <IconButton>
-              <Info />
+              <Info onClick={() => setShowInfo((pre) => !pre)} />
             </IconButton>
           </Tooltip>
         </FormLabel>
+        {
+          showInfo &&
+            <ThemeProvider theme={darkTheme}>
+              <Paper
+                style={{ margin: '10px' }}
+                elevation={3}
+              >
+                <Box margin='10px'>
+                  {
+                    examples.map((example, i) => (
+                      <Paper
+                        style={{ margin: '15px 10px' }}
+                        elevation={24}
+                      >
+                        <Typography
+                          margin='5px'
+                        >
+                          Example {i + 1}. {example.title}
+                        </Typography>
+                        <TextField
+                          label="Base branch regexp (target)"
+                          size="small"
+                          defaultValue={example.baseRegExp}
+                          disabled
+                        />
+                        <TextField
+                          label="Head branch regexp (source)"
+                          size="small"
+                          defaultValue={example.headRegExp}
+                          disabled
+                        />
+                        <TextField
+                          label="Alert message"
+                          size="small"
+                          defaultValue={example.alertMessage}
+                          disabled
+                        />
+                        <FormControlLabel
+                          style={{
+                            margin: '0px 5px',
+                          }}
+                          labelPlacement="end"
+                          label="Strict error option (prevent the merge)"
+                          control={
+                            <Switch
+                              color="primary"
+                              checked={example.enablePreventMerge}
+                              disabled
+                            />
+                          }
+                        />
+                      </Paper>
+                    ))
+                  }
+                </Box>
+              </Paper>
+            </ThemeProvider>
+        }
         {
           blacklists.length > 0 && blacklists.map(((bl, i) => (
             <Paper
@@ -96,9 +179,9 @@ const Options = () => {
                 </IconButton>
               </Typography>
               <TextField
-                label="Base branch (target)"
+                label="Base branch regexp (target)"
                 size="small"
-                placeholder="If empty, then allow all base branch"
+                placeholder="If empty, then ignore the base branch check"
                 defaultValue={bl.baseRegExp}
                 value={bl.baseRegExp}
                 onChange={(e) => setBlacklists(bls => {
@@ -108,9 +191,9 @@ const Options = () => {
                 })}
               />
               <TextField
-                label="Head branch (source)"
+                label="Head branch regexp (source)"
                 size="small"
-                placeholder="If empty, then allow all head branch"
+                placeholder="If empty, then ignore the head branch check"
                 defaultValue={bl.headRegExp}
                 value={bl.headRegExp}
                 onChange={(e) => setBlacklists(bls => {
@@ -119,12 +202,24 @@ const Options = () => {
                   return blacklists;
                 })}
               />
+              <TextField
+                label="Alert message"
+                size="small"
+                placeholder="If the above checks cannot be passed, then will show this alert message"
+                defaultValue={bl.alertMessage}
+                value={bl.alertMessage}
+                onChange={(e) => setBlacklists(bls => {
+                  const blacklists = [...bls];
+                  blacklists[i].alertMessage = e.target.value;
+                  return blacklists;
+                })}
+              />
               <FormControlLabel
                 style={{
                   margin: '10px',
                 }}
                 labelPlacement="end"
-                label="Prevent merge option"
+                label="Strict error option (prevent the merge)"
                 value={bl.enablePreventMerge}
                 control={
                   <Switch
@@ -142,10 +237,10 @@ const Options = () => {
         }
         <Button
           style={{
-            width: '100%',
+            width: 'calc(100% - 20px)',
             alignItems: 'center',
             justifyItems: 'center',
-            margin: '10px',
+            margin: '20px 10px 10px 10px',
           }}
           variant="contained"
           onClick={() => setBlacklists([...blacklists, defaultBlacklist])}
@@ -156,12 +251,13 @@ const Options = () => {
       <div
         style={{
           // marginLeft: "auto",
-          margin: '10px 10px 10px 10px',
+          margin: '0px 10px 20px 10px',
           float: 'right',
         }}
       >
         <Button
           variant="contained"
+          color="success"
           onClick={saveOptions}
           startIcon={<SaveIcon />}
           disabled={hasSaved}
