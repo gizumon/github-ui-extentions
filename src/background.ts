@@ -8,7 +8,6 @@ export interface IMessage {
 const urlPattern = /^https:\/\/([^\/]*)(\/.*)/;
 
 chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
-  console.log(tabId, info, tab);
   const hasLoadCompleted = info.status === 'complete';
   if (hasLoadCompleted) {
     const msg: IMessage = {
@@ -18,7 +17,6 @@ chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
       path: getPath(tab.url),
     }
     chrome.tabs.sendMessage(tabId, msg, function(response) {
-      console.log(response);
     });
   }
 });

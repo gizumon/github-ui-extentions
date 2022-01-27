@@ -37,7 +37,6 @@ const Notification: React.FC<Props> = (props: Props) => {
       const bls: IBlacklist[] = items?.blacklists || [];
       let result: AlertColor = 'info';
       bls.some((bl) => {
-        console.log(bl);
         const baseRegExp = new RegExp(bl.baseRegExp);
         const headRegExp = new RegExp(bl.headRegExp);
         const isInBLBase = bl.baseRegExp ? baseRegExp.test(baseBranchName) : false;
@@ -67,6 +66,7 @@ const Notification: React.FC<Props> = (props: Props) => {
 
   return (
     <Alert
+      suppressHydrationWarning={true}
       variant="filled"
       severity={severity}
       className={notificationClassName}
@@ -74,6 +74,7 @@ const Notification: React.FC<Props> = (props: Props) => {
         width: '100%',
         alignItems: 'center',
         borderRadius: '0px 5px',
+        overflowX: 'auto',
       }}
     >
       <Stack

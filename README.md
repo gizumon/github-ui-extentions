@@ -8,7 +8,7 @@ Chrome Extension for GitHub (Support GitHub Enterprize)
 
 ### Display Base / Head branch in PR
 
-You can check base / head branch when you want to merge PR.
+You can check base / head branch before you merge Pull Request.
 
 ![success](./docs/assets/success.png)
 

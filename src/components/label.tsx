@@ -7,7 +7,6 @@ interface Props {
 }
 
 const Label: React.FC<Props> = ({ pullReqId }: Props) => {
-  console.log(pullReqId)
   return (
     <div className={labelClassName}>This is test label</div>
   );

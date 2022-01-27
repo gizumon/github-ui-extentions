@@ -5,12 +5,14 @@ import { IMessage } from './background';
 import Label, { labelClassName } from "./components/label";
 import Notification, { notificationClassName, notificationId } from "./components/notification";
 
-console.log('run initialize');
+window.addEventListener("focus", () => {
+  const path = window.location.pathname;
+  pathHandler(path);
+});
 
 const baseRefClassName = 'base-ref';
 const headRefClassName = 'head-ref';
 const mergeDetailClassName = 'mergeability-details';
-const mergeBlockCssSelector = '.merge-message > button, details'
 
 const regexpPullReq = /^issue_([0-9]+)$/;
 const regexpPullsPage = /\/([^\/]+)\/([^\/]+)\/pulls.+/; // 0:org, 1:repo
@@ -29,21 +31,22 @@ const host = window.location.host;
 // const octokit = isGithubHost(host) ? new Octokit() : new Octokit({ baseUrl: `https://${host}/api/v3` });
 
 chrome.runtime.onMessage.addListener(function (msg: IMessage, sender, sendResponse) {
-  console.log('on Message', msg);
   if (!validateNavMessage(msg) || host !== msg.host) {
     return;
   }
+  pathHandler(msg.path);
+});
+
+const pathHandler = (path: string = '') => {
   switch (true) {
     // case isPullsListPage(msg.path):
     //   return;
-    case isPullDetailPage(msg.path):
-      // for UI re render case without page move
-      // const timer = setInterval(onPullDetailPageLoad, 1000);
+    case isPullDetailPage(path):
       return onPullDetailPageLoad();
     default:
       return;
   }
-});
+}
 
 const validateNavMessage = (msg: IMessage): boolean => {
   if (!msg) return false;
@@ -53,7 +56,6 @@ const validateNavMessage = (msg: IMessage): boolean => {
 }
 
 const onPullsListPageLoad = async() => {
-  console.log('on /{org}/{repo}/pulls page show');
   if (hasElementAdded(labelClassName)) {
     return;
   }
@@ -87,12 +89,10 @@ const onPullDetailPageLoad = async(): Promise<void> => {
   }
   while (!hasReady() && count < maxRetry) {
     count = count + 1;
-    console.log('has ready', hasReady(), 'loop', count);
     await sleepWithDelay(delay);
   }
 
   if (count < maxRetry) {
-    console.log('find elements');
     appendNotificationEl();
   }
 }
@@ -106,7 +106,6 @@ const hasReady = () => {
     !baseRefEl || baseRefEl.length < 1 ||
     !headRefEl || headRefEl.length < 1
   ) {
-    console.log('Cannot find elements');
     return false;
   }
   return true;
@@ -142,7 +141,6 @@ const appendNotificationEl = () => {
 const hasElementAdded = (className: string): boolean => {
   const labelEls = document.getElementsByClassName(className);
   if (labelEls && labelEls.length > 0) {
-    console.log(`Already ${className} is inserted`);
     return true;
   }
   return false;

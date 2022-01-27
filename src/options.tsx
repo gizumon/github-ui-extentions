@@ -51,7 +51,6 @@ const Options = () => {
 
   useEffect(() => {
     chrome?.storage?.sync?.get(['blacklists'], (items) => {
-      console.log('get chrome storage', items)
       setBlacklists(items?.blacklists || [])
     });
   }, []);
