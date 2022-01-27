@@ -13,39 +13,49 @@ const Popup = () => {
         padding: '10px',
       }}
     >
-      <div>
+      <div
+        style={{
+          fontSize: '0.9rem',
+          marginBottom: '3px',
+        }}
+      >
         RegExp validations setting
       </div>
       <Chip
-        size="small"
         color="success"
         avatar={<Avatar alt="gizumon" src="icon.png" />}
         label="Extension Option Link"
         variant="filled"
+        component="a"
         onClick={() => {
           chrome?.runtime?.openOptionsPage()
         }}
         style={{
-          cursor: "pointer"
+          cursor: "pointer",
+          paddingLeft: '5px',
+          paddingRight: '5px',
         }}
       />
       <div
         style={{
-          margin: '10px 0px',
+          margin: '10px 0px 3px',
+          fontSize: '0.9rem',
         }}
       >
-        Issue report or any comments
+        How to use or Issue report
       </div>
       <Chip
-        size="small"
         color="info"
         avatar={<Avatar alt="gizumon" src="gizumon.jpg" />}
         component="a"
+        href="https://github.com/gizumon/github-ui-extentions#github-ui-extensions"
         label="Developer's Link"
         variant="filled"
         target="_blank"
         style={{
-          cursor: "pointer"
+          cursor: "pointer",
+          paddingLeft: '5px',
+          paddingRight: '5px',
         }}
       />
     </div>
