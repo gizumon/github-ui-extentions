@@ -6,7 +6,11 @@ Chrome Extension for GitHub (Support GitHub Enterprize)
 
 ## features
 
-### Display Base / Head branch in PR
+### Display Base / Head branch in Pull Request list page
+
+![list](./docs/assets/list.png)
+
+### Display Base / Head branch in Pull Request detail page
 
 You can check base / head branch before you merge Pull Request.
 
@@ -25,6 +29,10 @@ Based on the setting, this extension will validate the branch rule and raise an 
 If you set a validation as a strict mode, then merge button will be disabled and prevent from the unintended merge.
 
 ![error](./docs/assets/error.png)
+
+If click the check box, then the merge button will unlock.
+
+![error_unlock](./docs/assets/error_unlock.png)
 
 ## For developers
 

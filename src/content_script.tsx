@@ -79,6 +79,7 @@ const onPullsListPageLoad = async() => {
     console.warn(e);
     return {data: undefined};
   });
+  // console.log(data);
   if (!data) {
     return;
   }
@@ -96,26 +97,32 @@ const onPullsListPageLoad = async() => {
     count = count + 1;
     els.length < 1 && await sleepWithDelay();
   }
-  // workaround for the issue multiple elements inserted during sleep
-  if (hasElementAdded(labelClassName)) {
-    return;
-  }
   els.forEach((el) => {
     const pullReqId = getPullReqId(el.id);
     if (!pullReqId) {
       return;
     }
+    // workaround for the issue multiple elements inserted during sleep
+    const newId = `extensions-label-${pullReqId}`;
+    const existingEl = document.getElementById(newId)
+    if (existingEl) {
+      existingEl.remove();
+    }
+
     const extensionEl = document.createElement('div');
-    extensionEl.id = `extensions-label-${pullReqId}`;
+    extensionEl.id = newId;
     el.prepend(extensionEl);
     const mergeBranch = mergeBranches.find((b) => String(b.prNumber) === pullReqId);
+    if (!mergeBranch) {
+      return;
+    }
     ReactDOM.hydrate(
       <Label
         pullReqId={pullReqId}
-        headRef={mergeBranch?.headRef}
-        baseRef={mergeBranch?.baseRef}
-        baseHref={`/${owner}/${repo}/tree/${mergeBranch?.headRef}`}
-        headHref={`/${owner}/${repo}/tree/${mergeBranch?.baseRef}`}
+        headRef={mergeBranch.headRef}
+        baseRef={mergeBranch.baseRef}
+        baseHref={`/${owner}/${repo}/tree/${mergeBranch.headRef}`}
+        headHref={`/${owner}/${repo}/tree/${mergeBranch.baseRef}`}
       />, extensionEl);
   });
 }

@@ -54,6 +54,9 @@ const Notification: React.FC<Props> = (props: Props) => {
   }, []);
 
   useEffect(() => {
+    if (severity !== 'error') {
+      return;
+    }
     if (hasChecked) {
       hasElementAdded(disabledClassName) && enabledElementsByClassName(mergeBlockCssSelector);
     } else {

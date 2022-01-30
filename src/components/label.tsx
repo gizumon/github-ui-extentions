@@ -6,10 +6,10 @@ export const labelClassName = 'extensions-label';
 
 interface Props {
   pullReqId: string;
-  headRef?: string;
-  baseRef?: string;
-  headHref?: string;
-  baseHref?: string;
+  headRef: string;
+  baseRef: string;
+  headHref: string;
+  baseHref: string;
 };
 
 const chipStyle = {
