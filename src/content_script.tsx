@@ -5,6 +5,7 @@ import { IMessage } from './background';
 import Label, { labelClassName } from "./components/label";
 import Notification, { notificationClassName, notificationId } from "./components/notification";
 
+let octokit;
 window.addEventListener("focus", () => {
   const path = window.location.pathname;
   pathHandler(path);
@@ -15,22 +16,24 @@ const headRefClassName = 'head-ref';
 const mergeDetailClassName = 'mergeability-details';
 
 const regexpPullReq = /^issue_([0-9]+)$/;
-const regexpPullsPage = /\/([^\/]+)\/([^\/]+)\/pulls.+/; // 0:org, 1:repo
-const regexpPullDetailPage = /\/([^\/]+)\/([^\/]+)\/pull\/([^\/#?]+)[#?]?/; // 0:org, 1:repo, 2:id
+const regexpPullsPage = /\/([^\/]+)\/([^\/]+)\/pulls.*/; // 1:org, 2:repo
+const regexpPullDetailPage = /\/([^\/]+)\/([^\/]+)\/pull\/([^\/#?]+)[#?]?/; // 1:org, 2:repo, 2:id
+const regexpGitHubHost = /^github.com$/;
 const isPullsListPage = (path: string): boolean => regexpPullsPage.test(path);
 const isPullDetailPage = (path: string): boolean => regexpPullDetailPage.test(path);
+const isGitHubHost = (host: string): boolean => regexpGitHubHost.test(host);
 const getPullReqId = (id: string): string => {
   const results = id.match(regexpPullReq);
-  if (!results || results.length < 1) {
+  if (!results || results.length < 2) {
     return '';
   }
-  return results[0];
+  return results[1];
 }
 
 const host = window.location.host;
-// const octokit = isGithubHost(host) ? new Octokit() : new Octokit({ baseUrl: `https://${host}/api/v3` });
 
 chrome.runtime.onMessage.addListener(function (msg: IMessage, sender, sendResponse) {
+  // console.log('on message', msg);
   if (!validateNavMessage(msg) || host !== msg.host) {
     return;
   }
@@ -38,9 +41,10 @@ chrome.runtime.onMessage.addListener(function (msg: IMessage, sender, sendRespon
 });
 
 const pathHandler = (path: string = '') => {
+  // console.log('path', path, isPullsListPage(path));
   switch (true) {
-    // case isPullsListPage(msg.path):
-    //   return;
+    case isPullsListPage(path):
+      return onPullsListPageLoad();
     case isPullDetailPage(path):
       return onPullDetailPageLoad();
     default:
@@ -56,18 +60,38 @@ const validateNavMessage = (msg: IMessage): boolean => {
 }
 
 const onPullsListPageLoad = async() => {
+  console.log('run pulls list');
   if (hasElementAdded(labelClassName)) {
     return;
   }
 
+  const matches = window.location.pathname.match(regexpPullsPage);
+  if (!matches?.length || matches.length < 2) {
+    return;
+  }
+
+  const host = window.location.host;
+  octokit = isGitHubHost(host) ? new Octokit() : new Octokit({ baseUrl: `https://${host}/api/v3` });
+
+
   const els = document.querySelectorAll("div[id^=issue_]");
-  // octokit.rest.pulls.get({
-  //   owner: "octokit",
-  //   repo: "rest.js",
-  //   pull_number: 123,
-  // }).catch(e => {
-  //   console.warn(e);
-  // })
+  const owner = matches[1];
+  const repo = matches[2];
+  console.log(matches, owner, repo);
+  const { data } = await octokit.rest.pulls.list({owner, repo}).catch(e => {
+    console.warn(e);
+    return {data: undefined};
+  });
+  if (!data) {
+    return;
+  }
+
+  const mergeBranches = data.map((obj) => ({
+    prNumber: obj.number,
+    headRef: obj.head.ref,
+    baseRef: obj.base.ref,      
+  }));
+
   els.forEach((el, i) => {
     const pullReqId = getPullReqId(el.id);
     if (!pullReqId) {
@@ -76,7 +100,16 @@ const onPullsListPageLoad = async() => {
     const extensionEl = document.createElement('div');
     extensionEl.id = `extensions-label-${pullReqId}`;
     el.prepend(extensionEl);
-    ReactDOM.hydrate(<Label pullReqId={pullReqId} />, extensionEl);
+    const mergeBranch = mergeBranches.find((b) => String(b.prNumber) === pullReqId);
+    // console.log(mergeBranches, mergeBranch, pullReqId);
+    ReactDOM.hydrate(
+      <Label
+        pullReqId={pullReqId}
+        headRef={mergeBranch?.headRef}
+        baseRef={mergeBranch?.baseRef}
+        baseHref={`/${owner}/${repo}/tree/${mergeBranch?.headRef}`}
+        headHref={`/${owner}/${repo}/tree/${mergeBranch?.baseRef}`}
+      />, extensionEl);
   });
 }
 

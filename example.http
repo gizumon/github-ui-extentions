@@ -1,0 +1,3 @@
+### Request sample
+
+GET https://api.github.com/repos/gizumon/github-ui-extentions/pulls
