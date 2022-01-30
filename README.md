@@ -14,7 +14,7 @@ Chrome Extension for GitHub (Support GitHub Enterprize)
 
 You can check base / head branch before you merge Pull Request.
 
-![success](./docs/assets/success.png)
+![info](./docs/assets/info.png)
 
 ### Regular Expression Branch Rule validation
 
