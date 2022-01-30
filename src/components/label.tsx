@@ -36,29 +36,6 @@ const Label: React.FC<Props> = ({ pullReqId, headRef, baseRef, headHref, baseHre
     >
       <Chip
         size="small"
-        label={headRef}
-        component="a"
-        href={headHref}
-        variant="filled"
-        clickable
-        style={{
-          ...chipStyle,
-          backgroundColor: `${getColorFromString(headRef)}`,
-        }}
-        sx={{
-          '&> span': {
-            color: `${getColorFromString(headRef)}`,
-            filter: 'invert(100%) grayscale(100%) contrast(100)',  
-          },
-        }}
-      />
-      <MergeTypeIcon
-        style={{
-          transform: 'rotate(-90deg)'
-        }}
-      />
-      <Chip
-        size="small"
         label={baseRef}
         component="a"
         href={baseHref}
@@ -71,6 +48,29 @@ const Label: React.FC<Props> = ({ pullReqId, headRef, baseRef, headHref, baseHre
         sx={{
           '&> span': {
             color: `${getColorFromString(baseRef)}`,
+            filter: 'invert(100%) grayscale(100%) contrast(100)',  
+          },
+        }}
+      />
+      <MergeTypeIcon
+        style={{
+          transform: 'rotate(-90deg)'
+        }}
+      />
+      <Chip
+        size="small"
+        label={headRef}
+        component="a"
+        href={headHref}
+        variant="filled"
+        clickable
+        style={{
+          ...chipStyle,
+          backgroundColor: `${getColorFromString(headRef)}`,
+        }}
+        sx={{
+          '&> span': {
+            color: `${getColorFromString(headRef)}`,
             filter: 'invert(100%) grayscale(100%) contrast(100)',  
           },
         }}

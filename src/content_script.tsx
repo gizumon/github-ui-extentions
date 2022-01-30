@@ -4,9 +4,10 @@ import { Octokit } from "@octokit/rest";
 import { IMessage } from './background';
 import Label, { labelClassName } from "./components/label";
 import Notification, { notificationClassName, notificationId } from "./components/notification";
+import { hasElementAdded } from './services/element';
 
 let octokit;
-window.addEventListener("focus", () => {
+window.addEventListener("focus popstate", () => {
   const path = window.location.pathname;
   pathHandler(path);
 });
@@ -60,7 +61,6 @@ const validateNavMessage = (msg: IMessage): boolean => {
 }
 
 const onPullsListPageLoad = async() => {
-  console.log('run pulls list');
   if (hasElementAdded(labelClassName)) {
     return;
   }
@@ -73,11 +73,8 @@ const onPullsListPageLoad = async() => {
   const host = window.location.host;
   octokit = isGitHubHost(host) ? new Octokit() : new Octokit({ baseUrl: `https://${host}/api/v3` });
 
-
-  const els = document.querySelectorAll("div[id^=issue_]");
   const owner = matches[1];
   const repo = matches[2];
-  console.log(matches, owner, repo);
   const { data } = await octokit.rest.pulls.list({owner, repo}).catch(e => {
     console.warn(e);
     return {data: undefined};
@@ -92,6 +89,17 @@ const onPullsListPageLoad = async() => {
     baseRef: obj.base.ref,      
   }));
 
+  let count = 0;
+  let els = document.querySelectorAll("div[id^=issue_]");
+  while (els.length < 1 && count < 5) {
+    els = document.querySelectorAll("div[id^=issue_]");
+    count += count;
+    els.length < 1 && await sleepWithDelay();
+    console.log('make el', els, els.length < 1);
+  }
+  if (els.length < 1) {
+    await sleepWithDelay();
+  }
   els.forEach((el, i) => {
     const pullReqId = getPullReqId(el.id);
     if (!pullReqId) {
@@ -101,7 +109,6 @@ const onPullsListPageLoad = async() => {
     extensionEl.id = `extensions-label-${pullReqId}`;
     el.prepend(extensionEl);
     const mergeBranch = mergeBranches.find((b) => String(b.prNumber) === pullReqId);
-    // console.log(mergeBranches, mergeBranch, pullReqId);
     ReactDOM.hydrate(
       <Label
         pullReqId={pullReqId}
@@ -120,7 +127,7 @@ const onPullDetailPageLoad = async(): Promise<void> => {
   if (hasElementAdded(notificationClassName)) {
     return;
   }
-  while (!hasReady() && count < maxRetry) {
+  while (!hasReady([mergeDetailClassName, baseRefClassName, headRefClassName]) && count < maxRetry) {
     count = count + 1;
     await sleepWithDelay(delay);
   }
@@ -130,18 +137,11 @@ const onPullDetailPageLoad = async(): Promise<void> => {
   }
 }
 
-const hasReady = () => {
-  const targetEl = document.getElementsByClassName(mergeDetailClassName);
-  const baseRefEl = document.getElementsByClassName(baseRefClassName);
-  const headRefEl = document.getElementsByClassName(headRefClassName);
-  if (
-    !targetEl || targetEl.length < 1 ||
-    !baseRefEl || baseRefEl.length < 1 ||
-    !headRefEl || headRefEl.length < 1
-  ) {
-    return false;
-  }
-  return true;
+const hasReady = (classNames: string[]) => {
+  return classNames.every((name) => {
+    const el = document.getElementsByClassName(name);
+    return el && el.length > 0;
+  });
 }
 
 const appendNotificationEl = () => {
@@ -169,14 +169,6 @@ const appendNotificationEl = () => {
     />,
     extensionEl
   );
-}
-
-const hasElementAdded = (className: string): boolean => {
-  const labelEls = document.getElementsByClassName(className);
-  if (labelEls && labelEls.length > 0) {
-    return true;
-  }
-  return false;
 }
 
 const sleepWithDelay = async(delay: number = 500): Promise<boolean> => await new Promise((resolve) => setTimeout(resolve, delay));
