@@ -93,9 +93,8 @@ const onPullsListPageLoad = async() => {
   let els = document.querySelectorAll("div[id^=issue_]");
   while (els.length < 1 && count < 5) {
     els = document.querySelectorAll("div[id^=issue_]");
-    count += count;
+    count = count + 1;
     els.length < 1 && await sleepWithDelay();
-    console.log('make el', els, els.length < 1);
   }
   if (els.length < 1) {
     await sleepWithDelay();
