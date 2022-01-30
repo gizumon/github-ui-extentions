@@ -96,10 +96,11 @@ const onPullsListPageLoad = async() => {
     count = count + 1;
     els.length < 1 && await sleepWithDelay();
   }
-  if (els.length < 1) {
-    await sleepWithDelay();
+  // workaround for the issue multiple elements inserted during sleep
+  if (hasElementAdded(labelClassName)) {
+    return;
   }
-  els.forEach((el, i) => {
+  els.forEach((el) => {
     const pullReqId = getPullReqId(el.id);
     if (!pullReqId) {
       return;
