@@ -3,7 +3,7 @@
 
   "name": "GitHub UI Extensions",
   "description": "Chrome Extension for GitHub",
-  "version": "1.0",
+  "version": "1.1",
   "icons": {
     "16": "icon_16.png",
     "48": "icon_48.png",
