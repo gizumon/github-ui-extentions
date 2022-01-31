@@ -4,11 +4,11 @@
 
 Chrome Extension for GitHub (Support GitHub Enterprize)
 
-## How to install it
+## How to install
 
 <details><summary>From GitHub</summary>
 
-* Clone this tool
+* Clone this repo
 
     ```bash
     git clone https://github.com/gizumon/github-ui-extentions.git
@@ -22,13 +22,11 @@ Chrome Extension for GitHub (Support GitHub Enterprize)
     npm run build # required nodejs
     ```
 
-* Load build package
+* Load build package into Chrome
   * Access Extension in Chrome.
     * chrome://extensions/
   * Click "load extensions"
     * ![load package](./assets/../docs/assets/load_package.png)
-
-* Access GitHub
 
 </details>
 
@@ -38,7 +36,7 @@ Chrome Extension for GitHub (Support GitHub Enterprize)
 
 </details>
 
-## features
+## Features
 
 ### Display Base / Head branch in Pull Request list page
 
