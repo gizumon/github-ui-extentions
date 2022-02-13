@@ -75,7 +75,7 @@ const onPullsListPageLoad = async() => {
 
   const owner = matches[1];
   const repo = matches[2];
-  const { data } = await octokit.rest.pulls.list({owner, repo}).catch(e => {
+  const { data } = await octokit.rest.pulls.list({owner, repo, state: 'all'}).catch(e => {
     console.warn(e);
     return {data: undefined};
   });
@@ -123,7 +123,8 @@ const onPullsListPageLoad = async() => {
         baseRef={mergeBranch.baseRef}
         baseHref={`/${owner}/${repo}/tree/${mergeBranch.headRef}`}
         headHref={`/${owner}/${repo}/tree/${mergeBranch.baseRef}`}
-      />, extensionEl);
+      />, extensionEl
+    );
   });
 }
 
