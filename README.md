@@ -4,13 +4,49 @@
 
 Chrome Extension for GitHub (Support GitHub Enterprize)
 
-## features
+## How to install
 
-### Display Base / Head branch in PR
+<details><summary>From GitHub</summary>
+
+* Clone this repo
+
+    ```bash
+    git clone https://github.com/gizumon/github-ui-extentions.git
+    ```
+
+* Build
+
+    ```bash
+    # cd working directory
+    cd github-ui-extentions
+    npm run build # required nodejs
+    ```
+
+* Load build package into Chrome
+  * Access Extension in Chrome.
+    * chrome://extensions/
+  * Click "load extensions"
+    * ![load package](./assets/../docs/assets/load_package.png)
+
+</details>
+
+<details><summary>From Chrome Web Store</summary>
+
+* Please find [here](https://chrome.google.com/webstore/detail/github-ui-extensions/lkjhfgipjjdhohlhbmjkjhiddekipcco?hl=ja&authuser=0)
+
+</details>
+
+## Features
+
+### Display Base / Head branch in Pull Request list page
+
+![list](./docs/assets/list.png)
+
+### Display Base / Head branch in Pull Request detail page
 
 You can check base / head branch before you merge Pull Request.
 
-![success](./docs/assets/success.png)
+![info](./docs/assets/info.png)
 
 ### Regular Expression Branch Rule validation
 
@@ -25,6 +61,10 @@ Based on the setting, this extension will validate the branch rule and raise an 
 If you set a validation as a strict mode, then merge button will be disabled and prevent from the unintended merge.
 
 ![error](./docs/assets/error.png)
+
+If click the check box, then the merge button will unlock.
+
+![error_unlock](./docs/assets/error_unlock.png)
 
 ## For developers
 
