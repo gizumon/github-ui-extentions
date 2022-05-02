@@ -75,7 +75,7 @@ const onPullsListPageLoad = async() => {
 
   const owner = matches[1];
   const repo = matches[2];
-  const { data } = await octokit.rest.pulls.list({owner, repo, state: 'all'}).catch(e => {
+  const { data } = await octokit.rest.pulls.list({owner, repo, state: 'all', per_page: 100}).catch(e => {
     console.warn(e);
     return {data: undefined};
   });
