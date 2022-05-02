@@ -71,7 +71,7 @@ const Label: React.FC<Props> = ({ pullReqId, headRef, baseRef, headHref, baseHre
         sx={{
           '&> span': {
             color: `${getColorFromString(headRef)}`,
-            filter: 'invert(100%) grayscale(100%) contrast(100)',  
+            filter: 'invert(100%) grayscale(100%) contrast(1000)',  
           },
         }}
       />
